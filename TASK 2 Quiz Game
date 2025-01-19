@@ -1,0 +1,92 @@
+package com.company;
+
+import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class QuizGame {
+
+    static class Question {
+        String question;
+        String[] options;
+        int correctAnswerIndex;
+
+        Question(String question, String[] options, int correctAnswerIndex) {
+            this.question = question;
+            this.options = options;
+            this.correctAnswerIndex = correctAnswerIndex;
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Define the quiz questions, options, and correct answers
+        Question[] quizQuestions = {
+                new Question("What is the capital of France?", new String[]{"A) Berlin", "B) Madrid", "C) Paris", "D) Rome"}, 2),
+                new Question("What is 2 + 2?", new String[]{"A) 3", "B) 4", "C) 5", "D) 6"}, 1),
+                new Question("Which planet is known as the Red Planet?", new String[]{"A) Earth", "B) Mars", "C) Jupiter", "D) Saturn"}, 1),
+                new Question("What is the largest ocean on Earth?", new String[]{"A) Atlantic", "B) Indian", "C) Arctic", "D) Pacific"}, 3)
+        };
+
+        int score = 0;
+        int totalQuestions = quizQuestions.length;
+        int[] answers = new int[totalQuestions];
+
+        // Timer for each question
+        Timer timer = new Timer();
+
+        for (int i = 0; i < totalQuestions; i++) {
+            Question currentQuestion = quizQuestions[i];
+
+            System.out.println("\nQuestion " + (i + 1) + ": " + currentQuestion.question);
+            for (String option : currentQuestion.options) {
+                System.out.println(option);
+            }
+
+            final int questionIndex = i; // To access the correct question answer
+            boolean[] answered = {false};
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (!answered[0]) {
+                        System.out.println("\nTime's up! Moving to next question...");
+                        answers[questionIndex] = -1;  // Mark as unanswered
+                    }
+                }
+            }, 10000); // Set timer to 10 seconds per question
+
+            // Take user's input
+            System.out.print("\nSelect your answer (A/B/C/D): ");
+            String userAnswer = scanner.nextLine().toUpperCase();
+
+            if (userAnswer.equals("A") || userAnswer.equals("B") || userAnswer.equals("C") || userAnswer.equals("D")) {
+                int userAnswerIndex = "ABCD".indexOf(userAnswer);
+                if (userAnswerIndex == currentQuestion.correctAnswerIndex) {
+                    score++;
+                    System.out.println("Correct!");
+                } else {
+                    System.out.println("Incorrect.");
+                }
+                answered[0] = true; // Answered flag
+                answers[questionIndex] = userAnswerIndex;
+            } else {
+                System.out.println("Invalid choice. No points awarded.");
+            }
+        }
+
+        // Result Screen
+        System.out.println("\nQuiz Completed!");
+        System.out.println("Your final score: " + score + "/" + totalQuestions);
+
+        System.out.println("\nSummary of Results:");
+        for (int i = 0; i < totalQuestions; i++) {
+            Question currentQuestion = quizQuestions[i];
+            String result = answers[i] == currentQuestion.correctAnswerIndex ? "Correct" : (answers[i] == -1 ? "No Answer" : "Incorrect");
+            System.out.println("Q" + (i + 1) + ": " + result);
+        }
+
+        scanner.close();
+    }
+}
+
